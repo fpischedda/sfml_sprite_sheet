@@ -1,0 +1,7 @@
+includedir=@INCLUDE_INSTALL_DIR@
+
+Name: @PROJECT_NAME@
+Description: Simple sprite sheets utilities for SFML 2.x
+Version: @LIB_VERSION_STRING@
+URL: https://github.com/fpischedda/sfml_sprite_sheet
+Cflags: -I${includedir}
