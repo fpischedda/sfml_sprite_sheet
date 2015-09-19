@@ -1,6 +1,6 @@
 # sfml_sprite_sheet
 
-simple sprite sheet support for sfml
+sprite sheet based animation library for SFML 2
 
 ## Building From Source
 
@@ -13,7 +13,7 @@ Then open a terminal, go to the source directory and type the following commands
     $ cmake ..
     $ make
 
-## Running unit tests
+## Running unit tests - NO YET IMPLEMENTED
 
 After building this project you may run its unit tests by using these commands:
 
@@ -22,10 +22,4 @@ After building this project you may run its unit tests by using these commands:
 
 ## License
 
-![GNU GPLv3 Image](https://www.gnu.org/graphics/gplv3-127x51.png)
-
-This program is Free Software: You can use, study share and improve it at your
-will. Specifically you can redistribute and/or modify it under the terms of the
-[GNU General Public License](https://www.gnu.org/licenses/gpl.html) as
-published by the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+3 Clause BSD, see LICENSE file for details
