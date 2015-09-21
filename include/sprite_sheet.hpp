@@ -43,9 +43,9 @@ public:
   SpriteSheet(const sf::Texture* tex=NULL);
 
   template <typename T>
-  void add_frame_rect(const sf::Rect<T> rect);
-  void add_frame(const std::vector<sf::Vector2f>& points);
-  void set_stexture(const sf::Texture& texture);
+  SpriteSheet& add_frame_rect(const sf::Rect<T> rect);
+  SpriteSheet& add_frame(const std::vector<sf::Vector2f>& points);
+  SpriteSheet& set_texture(const sf::Texture& texture);
 
   inline const sf::Texture* get_texture() const {
     return m_texture;

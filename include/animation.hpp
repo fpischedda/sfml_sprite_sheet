@@ -29,17 +29,15 @@
 #include <vector>
 #include "sprite_sheet.hpp"
 
-typedef std::vector<FrameInfo&> AnimationFrames;
+typedef std::vector<FrameInfo*> AnimationFrames;
 
 class Animation
 {
 public:
   Animation(const SpriteSheet& sprite_sheet, const AnimationFrames& frames);
 
-  void set_sprite_sheet(const SpriteSheet& sprite_sheet);
-
   inline const sf::Texture* get_texture() const {
-    return m_sprite_sheet->get_texture();
+    return m_sprite_sheet.get_texture();
   }
 
   inline const SpriteSheet& get_sprite_sheet() const {
@@ -51,7 +49,7 @@ public:
   }
 
   inline const FrameInfo& get_frame(std::size_t n) const {
-    return m_animation_frames[n];
+    return *m_animation_frames[n];
   }
 
 private:

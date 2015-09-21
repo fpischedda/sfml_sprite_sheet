@@ -36,7 +36,7 @@ SpriteSheet::SpriteSheet(const sf::Texture* tex) : m_texture(tex)
 }
 
 template <typename T>
-void SpriteSheet::add_frame_rect(sf::Rect<T> rect)
+SpriteSheet& SpriteSheet::add_frame_rect(sf::Rect<T> rect)
 {
   auto right = rect.left + rect.width;
   auto bottom = rect.top + rect.height;
@@ -58,9 +58,11 @@ void SpriteSheet::add_frame_rect(sf::Rect<T> rect)
   };
   
   m_frames.push_back(frame);
+
+  return *this;
 }
 
-void SpriteSheet::add_frame(const std::vector<sf::Vector2f>& points){
+SpriteSheet& SpriteSheet::add_frame(const std::vector<sf::Vector2f>& points){
 
   auto width = vector_length(points[0] - points[1]);
   auto height = vector_length(points[0] - points[2]);
@@ -82,9 +84,13 @@ void SpriteSheet::add_frame(const std::vector<sf::Vector2f>& points){
   };
   
   m_frames.push_back(frame);
+
+  return *this;
 }
 
-void SpriteSheet::set_texture(sf::Texture& texture)
+SpriteSheet& SpriteSheet::set_texture(const sf::Texture& texture)
 {
     m_texture = &texture;
+
+    return *this;
 }

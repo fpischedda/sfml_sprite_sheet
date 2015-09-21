@@ -71,7 +71,7 @@ const FrameInfo* AnimationPlayer::update(sf::Time dt) {
       m_current_time -= m_frame_time;
 
       // get next Frame index
-      if (m_current_frame_index + 1 < m_animation->get_size()) {
+      if (m_current_frame_index + 1 < m_animation->get_frame_count()) {
 	m_current_frame_index++;
       }
       else {
