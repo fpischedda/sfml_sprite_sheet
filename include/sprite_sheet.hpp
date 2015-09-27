@@ -27,28 +27,46 @@
 #define SPRITE_SHEET_HPP
 
 #include <vector>
+#include <memory>
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/Texture.hpp>
 
 struct FrameInfo {
+  enum Rotation {
+
+    None=0,
+    CW,
+    CCW
+  };
 
   sf::Vector2f tex_coords[4];
   sf::Vector2f frame_size[4];
   sf::FloatRect local_bounds;
+  Rotation rotation;
+
+  template <typename T>
+  static FrameInfo from_rect(const sf::Rect<T> rect,
+			      FrameInfo::Rotation rotation=FrameInfo::Rotation::None);
 };
 
 class SpriteSheet
 {
 public:
-  SpriteSheet(const sf::Texture* tex=NULL);
+  typedef std::unique_ptr<SpriteSheet> SpriteSheetPtr;
+  typedef std::unique_ptr<sf::Texture> TexturePtr;
+  
+  SpriteSheet(sf::Texture* texture=nullptr);
 
+  static SpriteSheetPtr from_json(const char* sprite_sheet_filename,
+						 const char* texture_filename);
   template <typename T>
-  SpriteSheet& add_frame_rect(const sf::Rect<T> rect);
+  SpriteSheet& add_frame_rect(const sf::Rect<T> rect,
+			      FrameInfo::Rotation rotation=FrameInfo::Rotation::None);
   SpriteSheet& add_frame(const std::vector<sf::Vector2f>& points);
-  SpriteSheet& set_texture(const sf::Texture& texture);
+  SpriteSheet& set_texture(TexturePtr& texture);
 
   inline const sf::Texture* get_texture() const {
-    return m_texture;
+    return m_texture.get();
   }
 
   inline std::size_t get_size() const {
@@ -61,7 +79,7 @@ public:
 
 private:
   std::vector<FrameInfo> m_frames;
-  const sf::Texture* m_texture;
+  TexturePtr m_texture;
 };
 
 #endif // SPRITE_SHEET_HPP

@@ -22,6 +22,8 @@
 ////////////////////////////////////////////////////////////
 
 #include <cmath>
+#include <rapidjson/document.h>
+#include "utils.hpp"
 #include "sprite_sheet.hpp"
 
 template <typename T>
@@ -30,35 +32,108 @@ const T vector_length(const sf::Vector2<T>& v){
   return static_cast<T>(std::fabs(sqrt(v.x*v.x + v.y*v.y)));
 }
 
-SpriteSheet::SpriteSheet(const sf::Texture* tex) : m_texture(tex)
-{
-
-}
-
 template <typename T>
-SpriteSheet& SpriteSheet::add_frame_rect(sf::Rect<T> rect)
+FrameInfo from_rect(const sf::Rect<T> rect,
+			    FrameInfo::Rotation rotation)
 {
   auto right = rect.left + rect.width;
   auto bottom = rect.top + rect.height;
   
-  FrameInfo frame = {
-    {
-      sf::Vector2f(0, 0),
-      sf::Vector2f(0, rect.height),
-      sf::Vector2f(rect.width, rect.height),
-      sf::Vector2f(rect.width, 0),
-    },
-    {
-      sf::Vector2f(rect.left, rect.top),
-      sf::Vector2f(rect.left, bottom),
-      sf::Vector2f(right, bottom),
-      sf::Vector2f(right, rect.top),
-    },
-    {0, 0, static_cast<float>(rect.width), static_cast<float>(rect.height) }
-  };
-  
-  m_frames.push_back(frame);
+  switch(rotation){
+    
+  case FrameInfo::Rotation::CW:
+    return {
+      {
+	sf::Vector2f(right, rect.top),
+	sf::Vector2f(rect.left, rect.top),
+	sf::Vector2f(rect.left, bottom),
+	sf::Vector2f(right, bottom),
+      },
+      {
+	sf::Vector2f(0, 0),
+	sf::Vector2f(0, rect.width),
+	sf::Vector2f(rect.height, rect.width),
+	sf::Vector2f(rect.height, 0),
+      },
+      {0, 0, static_cast<float>(rect.height), static_cast<float>(rect.width) }
+    };
+    
+  case FrameInfo::Rotation::CCW:
+    return {
+      {
+	sf::Vector2f(rect.left, bottom),
+	sf::Vector2f(right, bottom),
+	sf::Vector2f(right, rect.top),
+	sf::Vector2f(rect.left, rect.top),
+      },
+      {
+	sf::Vector2f(0, 0),
+	sf::Vector2f(0, rect.height),
+	sf::Vector2f(rect.width, rect.height),
+	sf::Vector2f(rect.width, 0),
+      },
+      {0, 0, static_cast<float>(rect.height), static_cast<float>(rect.width) }
+    };
 
+  default:
+    return {
+      {
+	sf::Vector2f(rect.left, rect.top),
+	sf::Vector2f(rect.left, bottom),
+	sf::Vector2f(right, bottom),
+	sf::Vector2f(right, rect.top),
+      },
+      {
+	sf::Vector2f(0, 0),
+	sf::Vector2f(0, rect.height),
+	sf::Vector2f(rect.width, rect.height),
+	sf::Vector2f(rect.width, 0),
+      },
+      {0, 0, static_cast<float>(rect.width), static_cast<float>(rect.height) }
+    };
+  }
+}
+
+SpriteSheet::SpriteSheet(sf::Texture* texture) : m_texture(texture)
+{
+
+}
+
+SpriteSheet::SpriteSheetPtr SpriteSheet::from_json(const char* sprite_sheet_filename,
+						   const char* texture_filename) {
+
+  sf::Texture* tex = new sf::Texture();
+
+  if( !tex->loadFromFile(texture_filename) ) {
+    delete tex;
+    return nullptr;
+  }
+
+  rapidjson::Document d;
+  d.Parse(load_text_file_content(sprite_sheet_filename).c_str());
+
+  SpriteSheetPtr ss(new SpriteSheet(tex));
+
+  const rapidjson::Value& frames = d["frames"];
+  for(auto f=frames.Begin(); f != frames.End(); ++f) {
+    auto rotation = (*f)["rotated"].GetBool() ?
+      FrameInfo::Rotation::CW : FrameInfo::Rotation::None;
+    const rapidjson::Value& frame = (*f)["frame"];
+    auto x = frame["x"].GetInt();
+    auto y = frame["y"].GetInt();
+    auto width = frame["w"].GetInt();
+    auto height = frame["h"].GetInt();
+    ss->add_frame_rect(sf::IntRect(x, y, width, height), rotation);
+  }
+
+  return ss;
+}
+
+template <typename T>
+SpriteSheet& SpriteSheet::add_frame_rect(const sf::Rect<T> rect,
+					 FrameInfo::Rotation rotation){
+
+  m_frames.push_back(FrameInfo::from_rect(rect, rotation));
   return *this;
 }
 
@@ -88,9 +163,9 @@ SpriteSheet& SpriteSheet::add_frame(const std::vector<sf::Vector2f>& points){
   return *this;
 }
 
-SpriteSheet& SpriteSheet::set_texture(const sf::Texture& texture)
+SpriteSheet& SpriteSheet::set_texture(TexturePtr& texture)
 {
-    m_texture = &texture;
+  m_texture = std::move(texture);
 
-    return *this;
+  return *this;
 }
