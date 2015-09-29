@@ -94,7 +94,7 @@ FrameInfo from_rect(const sf::Rect<T> rect,
   }
 }
 
-SpriteSheet::SpriteSheet(sf::Texture* texture) : m_texture(texture)
+SpriteSheet::SpriteSheet(TexturePtr& texture) : m_texture(std::move(texture))
 {
 
 }
@@ -102,10 +102,9 @@ SpriteSheet::SpriteSheet(sf::Texture* texture) : m_texture(texture)
 SpriteSheet::SpriteSheetPtr SpriteSheet::from_json(const char* sprite_sheet_filename,
 						   const char* texture_filename) {
 
-  sf::Texture* tex = new sf::Texture();
+  TexturePtr tex(new sf::Texture());
 
   if( !tex->loadFromFile(texture_filename) ) {
-    delete tex;
     return nullptr;
   }
 

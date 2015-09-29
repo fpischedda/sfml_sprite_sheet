@@ -55,10 +55,10 @@ public:
   typedef std::unique_ptr<SpriteSheet> SpriteSheetPtr;
   typedef std::unique_ptr<sf::Texture> TexturePtr;
   
-  SpriteSheet(sf::Texture* texture=nullptr);
+  SpriteSheet(TexturePtr& texture);
 
   static SpriteSheetPtr from_json(const char* sprite_sheet_filename,
-						 const char* texture_filename);
+				  const char* texture_filename);
   template <typename T>
   SpriteSheet& add_frame_rect(const sf::Rect<T> rect,
 			      FrameInfo::Rotation rotation=FrameInfo::Rotation::None);
